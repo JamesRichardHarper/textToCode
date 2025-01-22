@@ -9,24 +9,38 @@ function Start-Main {
     )
     
 }
+<#
+    Function to take in the contents of a .txt file
+#>
+function Get-Split-Code-Files{
+    param (
+        $textContents,
+        $regexQuery
+    )
+    Write-Output $textContents -split $regexQuery
+}
 ###
 Write-Host "Start Task"
 ###
 # $hostFile = $PSScriptRoot
 # $containedContents = Get-ChildItem $hostFile
-$textFiles = Get-ChildItem -Path *.txt
+$textFiles = Get-ChildItem -Path Input\*.txt
+$regexMatch = '\/\*\n\* (\S+.\S+)\n\*\/\n([\s\S]+?)(?=\/\*\n\* \S+.\S+\n\*\/|\z)'
 $codeToSplit = ""
 # TODO : Look at ShouldProcess functions
-if ($textFiles.Length == 0) {
-    <# TODO: Build something ot inform user nothing was found #>
-} elseif ($textFiles -gt 1) {
+if ($textFiles.GetType() -eq [System.IO.FileInfo]) {
+    $codeToSplit = Get-Content $textFiles
+    Write-Host $codeToSplit
+} elseif ($textFiles.GetType() -eq [System.Object[]]) {
     <# 
         TODO:
         for now, inform user that more than one text file was found
         but eventually add option to choose which file
     #>
+    Write-Host "More than 1 file found in Input folder"
 } else {
-    $codeToSplit = Get-Content $textFiles[0]
+    Write-Host "File Type Not Matched"
+    Write-Host "File Type Found: " + $textFiles
 }
 ###
 Write-Host "End Task"
