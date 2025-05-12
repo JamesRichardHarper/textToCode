@@ -11,8 +11,8 @@ Add-Type -AssemblyName System.Drawing
 $dContainerWidth = 300
 $dContainerHeight = 200
 
-$dTextboxWidth = ($dContainerWidth/100)*80
-$dTextboxHeight = ($dContainerHeight/100)*20
+[int32]$dTextboxWidth = ($dContainerWidth/100)*80
+[int32]$dTextboxHeight = ($dContainerHeight/100)*20
 
 $dButtonWidth = ($dContainerWidth/100)*20
 $dButtonHeight = ($dContainerHeight/100)*20
@@ -20,13 +20,27 @@ $dButtonHeight = ($dContainerHeight/100)*20
 $dText = ""
 
 #Functions
-function alignH([Int]$pWidth){
+# function createButton(
+#     [Int32]$buttonX,
+#     [Int32]$buttonY,
+#     [Int32]$sizeX,
+#     [Int32]$sizeY
+# ){
+
+# }
+function alignH([Int32]$pWidth){
     #Given the width
     #When the function triggers
     #Then we return the location int needed to centre the object
     return $dContainerWidth - $pWidth
 }
-function setGenericMeasurements($pObject, $pWidth, $pHeight, $pX, $pY){
+function setGenericMeasurements(
+    $pObject,
+    [Int32]$pWidth, 
+    [Int32]$pHeight, 
+    [Int32]$pX, 
+    [Int32]$pY
+){
     $pObject.Location = [Point]::new($pX, $pY)
     if (
         ($pObject).GetType().Name -ne "TextBox"
@@ -46,23 +60,33 @@ $container.StartPosition = "CenterScreen"
 ###Input
 $textPathInput = [TextBox]::new()
 try {
-    setGenericMeasurements($textPathInput, $dTextboxWidth, $dTextboxHeight, alignH(dTextboxWidth), 50)
+    # setGenericMeasurements($textPathInput, $dTextboxWidth, $dTextboxHeight, alignH(dTextboxWidth), 50)
+    setGenericMeasurements
+        $textPathInput 
+        $dTextboxWidth
+        $dTextboxHeight 
+        50
+        50
 }
 catch {
     Write-Output "Error:"
     Write-Output $_
 }
-# $textPathInput.Location = New-Object System.Drawing.Point(50,50)
+
+$textPathInput.Location = [Point]::new(50,50)
 
 ###Output
 $textPathOutput = [TextBox]::new()
 # setGenericMeasurements($textPathOutput, $dTextboxWidth, $dTextboxHeight, alignH(dTextboxWidth), 50)
-# $textPathOutput.Location = New-Object System.Drawing.Point(100,100)
-# $PrintButton = New-Object [Button]
+$textPathOutput.Location = [Point]::new(100,100)
+
+#Buttons
+$printButton = [Button]::new()
 
 #Controls
 $container.Controls.Add($textPathInput)
 $container.Controls.Add($textPathOutput)
+$container.Controls.Add($printButton)
 
 # Show the form
 $container.Topmost = $true
