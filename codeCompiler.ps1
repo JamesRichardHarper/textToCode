@@ -26,7 +26,8 @@ Write-Host "Start Task"
 # $hostFile = $PSScriptRoot
 # $containedContents = Get-ChildItem $hostFile
 $textFiles = Get-ChildItem -Path Input\*.txt
-$regexMatch = '\/\*\n\* (\S+.\S+)\n\*\/\n([\s\S]+?)(?=\/\*\n\* \S+.\S+\n\*\/|\z)'
+# $regexMatch = '\/\*\n\* (\S+\.\S+)\n\*\/\n([\s\S]+?)(?=\/\*\n\* \S+.\S+\n\*\/|\z)'
+$regexMatch = '\/\*\n\* (\S+\.\S+)\n\*\/\n([\s\S]+?)(?=\/\*\n\* \S+.\S+\n\*\/|\z)'
 $codeToSplit = ""
 $codeToSplit2 = ""
 $seperatedCodeSnippets = ""
@@ -38,13 +39,14 @@ if ($textFiles.GetType() -eq [System.IO.FileInfo]) {
     " $codeToSplit.GetType()
     Write-Host "DefaultSplit:
     " $codeToSplit2.GetType()
-    $seperatedCodeSnippets = [Regex]::Matches($codeToSplit2, $regexMatch)
+    # $seperatedCodeSnippets = [Regex]::Matches($codeToSplit2, $regexMatch)
+    $seperatedCodeSnippets = $codeToSplit -match $regexMatch
     Write-Host "String Looked at:
         " $codeToSplit2
     Write-Host "Regex:
         " $regexMatch
     Write-Host "Output:
-        " $seperatedCodeSnippets.Count
+        " $seperatedCodeSnippets
 } elseif ($textFiles.GetType() -eq [System.Object[]]) {
     <# 
         TODO:
