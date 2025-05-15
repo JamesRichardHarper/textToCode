@@ -8,21 +8,28 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 #Default Variables
+##Init variables needed
+$dScreenRatio = (9/16)
 $dFullWidth = 450
-$dFullHeight = $dFullWidth * (9/16)
+$dFullHeight = $dFullWidth * $dScreenRatio
 ##Initial Container
 $container = [Form]::new()
 $container.Text = "App"
 $container.Size = [Size]::new($dFullWidth,$dFullHeight)
 $container.StartPosition = "CenterScreen"
 
+##Relative Container Size
 $containerWidth = $container.ClientSize.Width
 $containerHeight = $container.ClientSize.Height
 
-[int32]$dTextboxWidth = ($containerWidth/100)*80
-[int32]$dTextboxHeight = ($containerHeight/100)*20
-[int32]$dButtonWidth = ($containerWidth/100)*20
-[int32]$dButtonHeight = ($containerHeight/100)*10
+##Textbox Size
+[int32]$dTextboxWidth = ($containerWidth/100)*20
+
+##Button Size
+[int32]$dButtonWidth = $containerWidth*(20/100)
+[int32]$dButtonHeight = $dButtonWidth * $dScreenRatio
+
+##Default Text
 [string]$dText = "notAssigned"
 
 #Functions
@@ -55,59 +62,64 @@ function New-Button(
     $functionButton.Text = $buttonText
     Set-ControlProperties -pObject $functionButton -pWidth $buttonWidth -pHeight $buttonHeight -pX $buttonX -pY $buttonY
     $functionButton.Add_Click($buttonAction)
-
     return $functionButton
 }
-# function New-Textbox(
-#     [Int32]$textboxX,
-#     [Int32]$textboxY,
-#     [Int32]$textboxWidth = $dButtonWidth,
-#     [Int32]$textboxHeight = $dButtonHeight,
-#     [scriptblock]$buttonAction = {Write-Host "Not Assigned"}
-# ){
-#     $functionButton = [Button]::new()
-#     $functionButton.Text = $buttonText
-#     Set-ControlProperties -pObject $functionButton -pWidth $buttonWidth -pHeight $buttonHeight -pX $buttonX -pY $buttonY
-#     $functionButton.Add_Click($buttonAction)
+function New-Textbox(
+    [Int32]$textBoxX,
+    [Int32]$textBoxY,
+    [Int32]$textBoxWidth = $dTextboxWidth
+){
+    $functionTextBox = [TextBox]::new()
+    Set-ControlProperties -pObject $functionTextBox -pWidth $textBoxWidth -pX $textBoxX -pY $textBoxY
+    return $functionTextBox
+}
 
-#     return $functionButton
-# }
-# function New-Button(
-#     [string]$controlType = "Button",
-#     [string]$buttonText = $dText,
-#     [Int32]$buttonX,
-#     [Int32]$buttonY,
-#     [Int32]$buttonWidth = $dButtonWidth,
-#     [Int32]$buttonHeight = $dButtonHeight,
-#     [scriptblock]$buttonAction = {Write-Host "Not Assigned"}
-# ){
-#     $functionButton = [Button]::new()
-#     $functionButton.Text = $buttonText
-#     Set-ControlProperties -pObject $functionButton -pWidth $buttonWidth -pHeight $buttonHeight -pX $buttonX -pY $buttonY
-#     $functionButton.Add_Click($buttonAction)
-
-#     return $functionButton
-# }
 #Object Setup
-##Textboxs
-###Input
-$textPathInput = [TextBox]::new()
-$textPathInput.Location = [Point]::new(50,50)
+##Object Locations
+$panelY = $containerHeight*(5/100)
+$panelX = $containerWidth*(5/100)
+$rowSpacing = 10
+$columnSpacing = 10
 
-###Output
-$textPathOutput = [TextBox]::new()
-$textPathOutput.Location = [Point]::new(100,100)
+##Initial Label
+$bigLabel = [Label]::new()
+$bigLabel.Text = "Folder Paths"
+$bigLabel.Location = [Point]::new($panelX,$panelY)
 
-#Buttons
-$exitButton = New-Button -buttonText "exit" -buttonX ($containerWidth-($dButtonWidth*1.75)) -buttonY ($containerHeight-($dButtonHeight*2))
-$printButton = New-Button -buttonText "testConsole" -buttonX ($dButtonWidth*0.75) -buttonY ($containerHeight-($dButtonHeight*2))
+##Panel 1
+$panelOne = [Panel]::new()
+$panelOne.AutoSize = $true
+$panelOne.Location = [Point]::new($panelX,$bigLabel.Bottom+$rowSpacing)
 
+$inputLabelOne = [Label]::new()
+$inputLabelOne.Text = "Code:"
+$inputLabelOne.Location = [Point]::new(0,(0))
+$textPathInputOne = New-Textbox -textBoxX ($inputLabelOne.ClientSize.Width + $columnSpacing) -textBoxY (0)
+$extractButtonOne = New-Button -buttonX ($textPathInputOne.Right + $columnSpacing) -buttonY (0) -buttonText "Extract" 
+
+$panelOne.Controls.Add($inputLabelOne)
+$panelOne.Controls.Add($textPathInputOne)
+$panelOne.Controls.Add($extractButtonOne)
+
+##Panel 2
+$panelTwo = [Panel]::new()
+$panelTwo.AutoSize = $true
+$panelTwo.Location = [Point]::new($panelX,$panelOne.Bottom+$rowSpacing)
+
+$inputLabelTwo = [Label]::new()
+$inputLabelTwo.Text = "Text:"
+$inputLabelTwo.Location = [Point]::new(0,(0))
+$textPathInputTwo = New-Textbox -textBoxX ($inputLabelTwo.ClientSize.Width + $columnSpacing) -textBoxY (0)
+$extractButtonTwo = New-Button -buttonX ($textPathInputTwo.Right + $columnSpacing) -buttonY (0) -buttonText "Compile" 
+
+$panelTwo.Controls.Add($inputLabelTwo)
+$panelTwo.Controls.Add($textPathInputTwo)
+$panelTwo.Controls.Add($extractButtonTwo)
 
 #Controls
-$container.Controls.Add($exitButton)
-$container.Controls.Add($printButton)
-$container.Controls.Add($textPathInput)
-$container.Controls.Add($textPathOutput)
+$container.Controls.Add($bigLabel)
+$container.Controls.Add($panelOne)
+$container.Controls.Add($panelTwo)
 
 # Show the form
 $container.Topmost = $true
