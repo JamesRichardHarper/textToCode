@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 ###
 <#
-    Function to start the maine process
+    Function to start the main process
 #>
 # function Start-Main {
 #     param (
