@@ -23,10 +23,10 @@ $containerWidth = $container.ClientSize.Width
 $containerHeight = $container.ClientSize.Height
 
 ##Textbox Size
-[int32]$dTextboxWidth = ($containerWidth/100)*20
+[int32]$dTextboxWidth = 200
 
 ##Button Size
-[int32]$dButtonWidth = $containerWidth*(20/100)
+[int32]$dButtonWidth = 75
 [int32]$dButtonHeight = $dButtonWidth * $dScreenRatio
 
 ##Default Text
@@ -74,6 +74,9 @@ function New-Textbox(
     return $functionTextBox
 }
 
+function Start-UI(){
+
+}
 #Object Setup
 ##Object Locations
 $panelY = $containerHeight*(5/100)
@@ -94,6 +97,10 @@ $panelOne.Location = [Point]::new($panelX,$bigLabel.Bottom+$rowSpacing)
 $inputLabelOne = [Label]::new()
 $inputLabelOne.Text = "Code:"
 $inputLabelOne.Location = [Point]::new(0,(0))
+$inputLabelOne.AutoSize = $true
+$inputLabelOne.Padding = [Padding]::new(0)
+##TODO: Having to manually set the width otherwise it defaults to 100
+$inputLabelOne.Width = 30
 $textPathInputOne = New-Textbox -textBoxX ($inputLabelOne.ClientSize.Width + $columnSpacing) -textBoxY (0)
 $extractButtonOne = New-Button -buttonX ($textPathInputOne.Right + $columnSpacing) -buttonY (0) -buttonText "Extract" 
 
