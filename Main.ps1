@@ -1,11 +1,12 @@
 using namespace System.Windows.Forms
+using namespace System.Windows.MessageBox
 using namespace System.Drawing
 
 Set-StrictMode -Version Latest
 Import-Module .\Modules\Model -Force
-Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Windows.Forms 
 Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName System.Windows.MessageBox
 
 #Default Variables
 ##Init variables needed
@@ -100,7 +101,7 @@ $inputLabelOne.Padding = [Padding]::new(0)
 ##TODO: Having to manually set the width otherwise it defaults to 100
 $inputLabelOne.Width = 30
 $extractTextBox = New-Textbox -textBoxX ($inputLabelOne.ClientSize.Width + $columnSpacing) -textBoxY (0)
-$extractButtonOne = New-Button -buttonX ($extractTextBox.Right + $columnSpacing) -buttonY (0) -buttonText "Extract" -buttonAction {Write-Host $extractTextBox.Text}
+$extractButtonOne = New-Button -buttonX ($extractTextBox.Right + $columnSpacing) -buttonY (0) -buttonText "Extract" -buttonAction {Convert-CodeToText $extractTextBox.Text}
 
 $panelOne.Controls.Add($inputLabelOne)
 $panelOne.Controls.Add($extractTextBox)
@@ -114,11 +115,11 @@ $panelTwo.Location = [Point]::new($panelX, $panelOne.Bottom + $rowSpacing)
 $inputLabelTwo = [Label]::new()
 $inputLabelTwo.Text = "Text:"
 $inputLabelTwo.Location = [Point]::new(0, (0))
-$textPathInputTwo = New-Textbox -textBoxX ($inputLabelTwo.ClientSize.Width + $columnSpacing) -textBoxY (0)
-$compileButtonTwo = New-Button -buttonX ($textPathInputTwo.Right + $columnSpacing) -buttonY (0) -buttonText "Compile"
+$compileTextBox = New-Textbox -textBoxX ($inputLabelTwo.ClientSize.Width + $columnSpacing) -textBoxY (0)
+$compileButtonTwo = New-Button -buttonX ($compileTextBox.Right + $columnSpacing) -buttonY (0) -buttonText "Compile" -buttonAction {Convert-TextToCode $compileTextBox.Text}
 
 $panelTwo.Controls.Add($inputLabelTwo)
-$panelTwo.Controls.Add($textPathInputTwo)
+$panelTwo.Controls.Add($compileTextBox)
 $panelTwo.Controls.Add($compileButtonTwo)
 
 #Controls

@@ -1,8 +1,5 @@
 Set-StrictMode -Version Latest
 
-[string]$global:extractBox = ""
-[string]$global:compileBox = ""
-
 <#
     Function to start the main process
 #>
@@ -12,62 +9,71 @@ Set-StrictMode -Version Latest
 function Get-PathAssets(
     $Path
 ){
-    return Get-ChildItem -Path $path -Recurse
+    try {
+        return Get-ChildItem -Path $Path -Recurse
+    }
+    catch {
+        Write-Host "Error: " + $_
+    }
 }
 function Convert-CodeToText(
     $Path
 ){
-    $pathContents = Get-PathAssets -Path -$Path
-    Write-Host $pathContents
+    try {
+        $pathContents = Get-PathAssets -Path $Path
+        Write-Host $pathContents
+    }
+    catch {
+        Write-Host "Error in converting to text:"
+        Write-Host $_
+    }
 }
-
-function Get-ExtractedPath(){
-    return $extractBox
-}
-function Set-ExtractedPath(
-    [string]$textboxValue
+function Find-PathContents(
+    $filesFound
 ){
-    $extractBox = $textboxValue
+    if ($pathContents.GetType() -eq [System.IO.FileInfo]) {
+        return $filesFound
+    }elseif ($pathContents.GetType() -eq [System.Object[]]) {
+        throw [System.IO.FileNotFoundException] "Multiple files found"
+    } else {
+        throw "Error occured when finding PathContents: $_"
+    }
 }
-function Start-LegacyModel(
-
+function Read-Text(
+    $file
 ){
-    Write-Host "Start Task"
-    # $hostFile = $PSScriptRoot
-    # $containedContents = Get-ChildItem $hostFile
-    $textFiles = Get-ChildItem -Path Input\*.txt
     # $regexMatch = '\/\*\n\* (\S+\.\S+)\n\*\/\n([\s\S]+?)(?=\/\*\n\* \S+.\S+\n\*\/|\z)'
     $regexMatch = '\/\*\n\* (\S+\.\S+)\n\*\/\n([\s\S]+?)(?=\/\*\n\* \S+.\S+\n\*\/|\z)'
-    $codeToSplit = ""
-    $codeToSplit2 = ""
-    $seperatedCodeSnippets = ""
-    # TODO : Look at ShouldProcess functions
-    if ($textFiles.GetType() -eq [System.IO.FileInfo]) {
-        $codeToSplit = Get-Content $textFiles -Raw
-        $codeToSplit2 = Get-Content -Delimiter "~~~~~~" $textFiles
-        Write-Host "RawSplit:
-        " $codeToSplit.GetType()
-        Write-Host "DefaultSplit:
-        " $codeToSplit2.GetType()
-        # $seperatedCodeSnippets = [Regex]::Matches($codeToSplit2, $regexMatch)
-        $seperatedCodeSnippets = $codeToSplit -match $regexMatch
-        Write-Host "String Looked at:
-            " $codeToSplit2
-        Write-Host "Regex:
-            " $regexMatch
-        Write-Host "Output:
-            " $seperatedCodeSnippets
-    } elseif ($textFiles.GetType() -eq [System.Object[]]) {
-        <# 
-            TODO:
-            for now, inform user that more than one text file was found
-            but eventually add option to choose which file
-        #>
-        Write-Host "More than 1 file found in Input folder"
-    } else {
-        Write-Host "File Type Not Matched"
-        Write-Host "File Type Found: " + $textFiles
+    $codeToSplit = Get-Content $file -Raw
+    $codeToSplit2 = Get-Content -Delimiter "~~~~~~" $file
+    Write-Host "RawSplit:
+    " $codeToSplit.GetType()
+    Write-Host "DefaultSplit:
+    " $codeToSplit2.GetType()
+    # $seperatedCodeSnippets = [Regex]::Matches($codeToSplit2, $regexMatch)
+    $seperatedCodeSnippets = $codeToSplit -match $regexMatch
+    Write-Host "String Looked at:
+        " $codeToSplit2
+    Write-Host "Regex:
+        " $regexMatch
+    Write-Host "Output:
+        " $seperatedCodeSnippets
+}
+function Convert-TextToCode(
+    $Path
+){
+    Write-Host "Start Task"
+    try {
+        $pathContents = Get-PathAssets -Path $Path
+        Write-Host $pathContents
+        # $textFiles = Get-ChildItem -Path Input\*.txt
+        # $pathContents = Get-ChildItem -Path $Path
+        Find-PathContents $Path
+        Read-Text $Path
+        Write-Host "End Task"
     }
-
-    Write-Host "End Task"
+    catch {
+        Write-Host "Error in converting to text:"
+        Write-Host $_
+    }
 }
